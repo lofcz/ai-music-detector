@@ -1,0 +1,33 @@
+# AI Music Detector Configuration
+
+# Paths
+paths:
+  data_dir: "./data"
+  fma_dir: "./data/fma_medium"
+  sonics_dir: "./data/sonics"
+  output_dir: "./output"
+  model_dir: "./models"
+
+# Audio processing parameters
+audio:
+  sample_rate: 16000  # All audio resampled to this rate (matches SONICS dataset)
+  n_fft: 8192
+  max_duration: 300   # seconds
+  
+# Fakeprint extraction parameters (absolute frequencies in Hz)
+fakeprint:
+  freq_min: 1000      # Hz - start of artifact detection range
+  freq_max: 8000      # Hz - Nyquist limit for 16kHz
+  hull_area: 10       # bins for lower hull computation
+  max_db: 5           # dB clipping for normalization
+  min_db: -45         # minimum dB threshold
+
+# Training parameters
+training:
+  test_split: 0.2
+  random_seed: 42
+  
+# ONNX export
+onnx:
+  model_name: "ai_music_detector.onnx"
+  opset_version: 14

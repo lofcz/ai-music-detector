@@ -1,0 +1,11 @@
+reference
+.code
+.vs
+.idea
+bin
+obj
+/python/data
+/python/models
+/python/output
+/python/release
+/scrape
