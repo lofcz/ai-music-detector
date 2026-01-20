@@ -117,33 +117,6 @@ python export_onnx.py --model ./models
 
 The trained model will be saved to `./models/ai_music_detector.onnx`.
 
-## Project Structure
-
-```
-ai-music-detector/
-├── python/                      # Training pipeline
-│   ├── requirements.txt
-│   ├── config.yaml
-│   ├── download_data.py         # Dataset downloader
-│   ├── extract_fakeprints.py    # GPU-accelerated feature extraction
-│   ├── train_model.py           # Model training
-│   ├── export_onnx.py           # ONNX export
-│   └── test_with_samples.py     # Quick validation
-│
-├── src/
-│   ├── AiMusicDetector/         # C# library
-│   │   ├── MusicDetector.cs     # Main API
-│   │   ├── AudioProcessor.cs    # Audio loading
-│   │   ├── FakeprintExtractor.cs# Feature extraction
-│   │   └── OnnxInference.cs     # ONNX inference
-│   │
-│   ├── AiMusicDetector.Console/ # CLI tool
-│   └── AiMusicDetector.Tests/   # Unit tests
-│
-├── reference/                   # Research papers and reference code
-└── AiMusicDetector.sln
-```
-
 ## API Reference
 
 ### MusicDetector
