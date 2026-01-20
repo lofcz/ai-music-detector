@@ -4,8 +4,8 @@ reference
 .idea
 bin
 obj
-/python/data
-/python/models
-/python/output
-/python/release
-/scrape
+src/python/data
+src/python/models
+src/python/output
+src/python/release
+src/scrape
