@@ -1,26 +1,18 @@
 # AI Music Detector
 
-A C# library for detecting AI-generated music using fakeprint analysis. Based on the research paper ["A Fourier Explanation of AI-Music Artifacts"](https://arxiv.org/abs/2506.19108) (ISMIR 2025).
+A model, training/inference scripts, and a library for detecting Suno <= 5 and Udio <= 1.5 generated music.
 
-## Overview
+## Model Description
 
-This project provides:
+This model analyzes the frequency spectrum of audio to detect characteristic artifacts 
+left by neural vocoders in AI music generators. These "fakeprints" are regularly-spaced 
+peaks in the spectrum caused by transposed convolution (deconvolution) layers.
 
-1. **Python Training Pipeline** - GPU-accelerated feature extraction and model training
-2. **C# Inference Library** - Fast, cross-platform inference with ONNX Runtime
+### Architecture
 
-The detector identifies spectral artifacts from deconvolution modules commonly used in AI music generators like Suno, Udio, and others.
-
-## How It Works
-
-AI music generators use neural decoders that produce systematic frequency artifacts ("fakeprints"). This library:
-
-1. Extracts a spectrogram from the audio
-2. Computes the average power spectrum
-3. Identifies peak residues above the spectral baseline
-4. Classifies using a simple logistic regression model
-
-**Accuracy**: 99%+ on Suno/Udio detection with <1% false positive rate.
+- **Type**: Logistic Regression on spectral features
+- **Input**: Fakeprint vector (3585 features)
+- **Output**: Probability of AI-generated content (0.0 = Real, 1.0 = AI)
 
 ## Quick Start
 
@@ -210,39 +202,35 @@ dotnet run --project src/AiMusicDetector.Console -- model.onnx song1.mp3 song2.m
 
 ## Performance
 
+Evaluated on a held-out test set of 17,866 samples (5,741 real, 12,125 AI-generated).
+
 | Metric | Value |
 |--------|-------|
-| Accuracy | 99%+ |
-| False Positive Rate | <1% |
-| Inference Time | ~50ms per track |
-| Model Size | ~100 KB |
+| Accuracy | 99.88% |
+| Precision | 0.9985 |
+| Recall | 0.9998 |
+| F1 Score | 0.9991 |
+| False Positive Rate | 0.31% |
+| False Negative Rate | 0.02% |
 
 ## Limitations
 
-- Detection may be less accurate for:
-  - Heavily compressed audio
-  - Very short clips (<5 seconds)
-  - Hybrid content (real + AI)
-- New AI generators may not have the same artifacts
+- **Sample Rate Dependent**: Audio must be resampled to 16000 Hz
+- **Minimum Duration**: Works best with 10+ seconds of audio
+- **Evolving Generators**: Needs retraining on new generations of AI music generators
+
+## Acknowledgements
+
+This implementation is based on the fakeprint detection method proposed by Afchar et al. [1], 
+which demonstrates that neural vocoders in generative music models produce characteristic 
+frequency-domain artifacts due to their deconvolution architecture.
+
+### References
+
+[1] D. Afchar, G. Meseguer-Brocal, K. Akesbi, and R. Hennequin, "A Fourier Explanation of 
+AI-music Artifacts," in *Proc. International Society for Music Information Retrieval 
+Conference (ISMIR)*, 2025. Available: https://arxiv.org/abs/2506.19108
 
 ## License
 
-- Code: MIT License
-- Model: CC BY-NC 4.0 (non-commercial use only)
-- Based on research by Deezer (patent pending for commercial use)
-
-## Citation
-
-```bibtex
-@inproceedings{afchar2025fourier,
-  author    = {Darius Afchar, Gabriel Meseguer‑Brocal, Kamil Akesbi and Romain Hennequin},
-  title     = {A Fourier Explanation of AI‑music Artifacts},
-  booktitle = {Proceedings of ISMIR},
-  year      = {2025}
-}
-```
-
-## Acknowledgments
-
-- Research paper: [A Fourier Explanation of AI-Music Artifacts](https://arxiv.org/abs/2506.19108)
-- Datasets: [FMA](https://github.com/mdeff/fma), [SONICS](https://github.com/awsaf49/sonics)
+MIT License
