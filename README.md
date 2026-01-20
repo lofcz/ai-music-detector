@@ -2,7 +2,7 @@
 
 # AI Music Detector
 
-A model, training/inference scripts, and a library for detecting Suno <= 5 and Udio <= 1.5 generated music.
+A model, training/inference scripts, and a library for detecting Suno <= 5 (up to 2026) and Udio <= 1.5 (up to 2025) generated music.
 
 ## Model Description
 
