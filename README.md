@@ -6,15 +6,40 @@ A model, training/inference scripts, and a library for detecting Suno ≤ 5 and 
 
 ## Model Description
 
-This model detects AI-generated music by analyzing spectral artifacts caused by deconvolution layers in neural vocoders. These layers perform upsampling through zero-insertion followed by convolution, which induces a periodization of the signal's  spectrum. The zero-upsampled signal contains multiple clones of the original spectrum, creating characteristic peaks at predictable frequency intervals determined by the stride parameters.
+This model detects AI-generated music by exploiting spectral artifacts inherent to neural vocoders. Most audio generators rely on deconvolution layers to upsample latent representations back to audio sample rates. These layers leave predictable fingerprints in the frequency domain.
 
-For a deconvolution with stride $k$, peaks appear at frequencies $n \cdot f_s$ for integers 
-$n \in [0, \lfloor k/2 \rfloor]$, where $f_s$ is the layer's input sampling rate. With $L$ 
-stacked layers, artifacts compound multiplicatively, the total peak count is 
-$\lfloor (\prod k_i) / 2 \rfloor + 1$. This pattern is unique to each architecture's stride 
-configuration and serves as a forensic fingerprint.
+### Deconvolution Artifacts
 
-These artifacts emerge from the architecture itself, not from training data or learned weights. This is why detection accuracy is extremely high for known generators, but also why the model requires retraining when new vocoder architectures are deployed.
+A deconvolution (transposed convolution) with stride $k$ is equivalent to two sequential operations:
+1. Zero-upsampling: Insert $k-1$ zeros between each sample
+2. Convolution: Apply the learned kernel
+
+The zero-upsampling is equivalent to oversampling a discrete signal. For a signal $s$ sampled at frequency $f_s$, the zero-upsampled version $v$ with stride $k$ satisfies:
+
+$$v = s \cdot \amalg_{1/kf_s}$$
+
+where $\amalg_T$ denotes a Dirac comb with period $T$. From the Fourier duality of Dirac combs:
+
+$$\mathcal{F}[\amalg_T] = \frac{1}{T}\amalg_{1/T}$$
+
+This means the spectrum of $v$ is read up to frequency $kf_s$ instead of $f_s$, causing periodic replication of the original spectrum. The high-energy DC component (bias from activations and layer outputs) gets cloned throughout the frequency range, creating characteristic peaks.
+
+### Peak Locations
+
+For a single deconvolution with stride $k$, peaks appear at frequencies $n \cdot f_s$ for all integers $n \in [0, \lfloor k/2 \rfloor]$.
+
+For $L$ stacked deconvolution layers with strides $\{k_1, k_2, \ldots, k_L\}$, artifacts compound recursively—each layer replicates not just the DC component but all previous peaks. The total number of peaks is:
+
+$$P = \left\lfloor \frac{\prod_{i=1}^{L} k_i}{2} \right\rfloor + 1$$
+
+### Architecture Fingerprinting
+
+These artifacts depend only on the stride configuration, not on training data or learned weights. This has two implications:
+
+1. High accuracy on known architectures: The spectral fingerprint is deterministic and consistent across all outputs from a given generator
+2. Requires retraining for new architectures: Different vocoder designs produce different peak patterns, so the model must be updated when generators change their architecture
+
+We extract a _fakeprint_ by computing the average spectrum, subtracting its lower envelope (to isolate peaks from melodic content), and analyzing the 1-8 kHz band where artifacts are most prominent.
 
 ## Quick Start
 
