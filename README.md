@@ -1,3 +1,5 @@
+[![AiMusicDetector](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Model-blue)](https://huggingface.co/lofcz/ai-music-detector)
+
 # AI Music Detector
 
 A model, training/inference scripts, and a library for detecting Suno <= 5 and Udio <= 1.5 generated music.
