@@ -1,18 +1,20 @@
 # AI Music Detector
 
-A model, training/inference scripts, and a library for detecting Suno <= 5 and Udio <= 1.5 generated music.
+A model, training/inference scripts, and a library for detecting Suno ≤ 5 and Udio ≤ 1.5 generated music.
 
 ## Model Description
 
-This model analyzes the frequency spectrum of audio to detect characteristic artifacts 
-left by neural vocoders in AI music generators. These "fakeprints" are regularly-spaced 
-peaks in the spectrum caused by transposed convolution (deconvolution) layers.
+This model detects AI-generated music by analyzing spectral artifacts left by neural 
+vocoders. These artifacts, called "fakeprints," appear as regularly-spaced peaks in the 
+frequency spectrum and are an inherent consequence of the transposed convolution 
+(deconvolution) layers used in generative audio models.
 
-### Architecture
+The model identifies deterministic mathematical signatures that every sample from a given generator exhibits. 
+This is why the accuracy is very high with minimal false positives.
 
-- **Type**: Logistic Regression on spectral features
-- **Input**: Fakeprint vector (3585 features)
-- **Output**: Probability of AI-generated content (0.0 = Real, 1.0 = AI)
+However, this also means the model does not generalize to unseen generators. It is trained 
+to detect artifacts from specific versions of Suno and Udio, and will require retraining 
+when new versions with different vocoder architectures are released.
 
 ## Quick Start
 
