@@ -6,17 +6,15 @@ A model, training/inference scripts, and a library for detecting Suno ≤ 5 and 
 
 ## Model Description
 
-This model detects AI-generated music by analyzing spectral artifacts left by neural 
-vocoders. These artifacts, called "fakeprints," appear as regularly-spaced peaks in the 
-frequency spectrum and are an inherent consequence of the transposed convolution 
-(deconvolution) layers used in generative audio models.
+This model detects AI-generated music by analyzing spectral artifacts caused by deconvolution layers in neural vocoders. These layers perform upsampling through zero-insertion followed by convolution, which induces a periodization of the signal's  spectrum. The zero-upsampled signal contains multiple clones of the original spectrum, creating characteristic peaks at predictable frequency intervals determined by the stride parameters.
 
-The model identifies deterministic mathematical signatures that every sample from a given generator exhibits. 
-This is why the accuracy is very high with minimal false positives.
+For a deconvolution with stride $k$, peaks appear at frequencies $n \cdot f_s$ for integers 
+$n \in [0, \lfloor k/2 \rfloor]$, where $f_s$ is the layer's input sampling rate. With $L$ 
+stacked layers, artifacts compound multiplicatively, the total peak count is 
+$\lfloor (\prod k_i) / 2 \rfloor + 1$. This pattern is unique to each architecture's stride 
+configuration and serves as a forensic fingerprint.
 
-However, this also means the model does not generalize to unseen generators. It is trained 
-to detect artifacts from specific versions of Suno and Udio, and will require retraining 
-when new versions with different vocoder architectures are released.
+These artifacts emerge from the architecture itself, not from training data or learned weights. This is why detection accuracy is extremely high for known generators, but also why the model requires retraining when new vocoder architectures are deployed.
 
 ## Quick Start
 
