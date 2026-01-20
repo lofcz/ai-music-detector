@@ -1,0 +1,25 @@
+description: Detects AI-generated music using fakeprint analysis
+input:
+  description: Normalized fakeprint features
+  name: fakeprint
+  shape:
+  - batch_size
+  - 3585
+  type: float32
+model_name: AI Music Detector
+output:
+  description: Probability of AI-generated content (0=Real, 1=AI)
+  name: ai_probability
+  shape:
+  - batch_size
+  - 1
+  threshold: 0.5
+  type: float32
+paper: A Fourier Explanation of AI-Music Artifacts (ISMIR 2025)
+preprocessing:
+  freq_max: 8000
+  freq_min: 1000
+  hull_area: 10
+  n_fft: 8192
+  sample_rate: 16000
+version: 1.0.0
