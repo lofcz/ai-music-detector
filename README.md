@@ -69,6 +69,26 @@ dotnet add package AiMusicDetector
 dotnet add reference src/AiMusicDetector/AiMusicDetector.csproj
 ```
 
+### In-process FFmpeg decoding (FFmpeg.AutoGen)
+
+For the closest match to Python/torchaudio/FFmpeg decoding, the C# pipeline can decode MP3 using **in-process FFmpeg** (no `ffmpeg.exe`) via `FFmpeg.AutoGen`.
+
+- **Override library path**:
+  - Set `AIMUSICDETECTOR_FFMPEG_LIBS` to the folder containing FFmpeg shared libraries (`avcodec`, `avformat`, `swresample`, etc.)
+
+- **Bundled binaries layout (recommended)**:
+  - `FFmpeg/bin/win-x64/*.dll`
+  - `FFmpeg/bin/win-arm64/*.dll`
+  - `FFmpeg/bin/linux-x64/*.so`
+  - `FFmpeg/bin/linux-arm64/*.so`
+  - `FFmpeg/bin/osx-x64/*.dylib`
+  - `FFmpeg/bin/osx-arm64/*.dylib`
+
+The loader also supports the legacy AutoGen example layout on Windows:
+- `FFmpeg/bin/x64/*.dll`
+
+If no in-process FFmpeg libraries are found, the code will fall back to the other decoding path(s).
+
 ## Training Your Own Model
 
 ### Prerequisites
@@ -139,6 +159,28 @@ python export_onnx.py --model ./models
 ```
 
 The trained model will be saved to `./models/ai_music_detector.onnx`.
+
+### Alternative: CNN Model (Robust to Audio Modifications)
+
+For better robustness against pitch shifts, EQ changes, mastering, and transcoding, 
+train the CNN-based model:
+
+```bash
+# Train CNN with on-the-fly augmentations
+python train_cnn.py \
+    --real ./data/fma/fma_medium \
+    --fake ./data/sonics/fake_songs
+
+# Export to ONNX
+python export_onnx_cnn.py
+
+# Inference
+python inference_cnn.py --model ./models/cnn_detector.onnx
+```
+
+The CNN model uses CQT spectrograms (log-frequency) which provide pitch-shift 
+invariance, and trains with data augmentation including pitch shifting, EQ, 
+compression, and noise injection.
 
 ## API Reference
 

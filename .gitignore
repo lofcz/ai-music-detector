@@ -9,3 +9,21 @@ src/python/models
 src/python/output
 src/python/release
 src/scrape
+/src/python/__pycache__
+/tools/compare_first_100_runs
+
+# FFmpeg native binaries (bundled for NuGet under src/cs/AiMusicDetector/runtimes/*/native/)
+/src/cs/AiMusicDetector/runtimes/**/native/*.dll
+/src/cs/AiMusicDetector/runtimes/**/native/*.so
+/src/cs/AiMusicDetector/runtimes/**/native/*.dylib
+/src/cs/AiMusicDetector/runtimes/**/native/*.exe
+/src/cqt/CQT.Tests/fft
+src/cqt/CQT.Tests/ref.py
+src/cqt/CQT.Tests/ref_core.py
+src/cqt/CQT.Tests/ref_filters.py
+src/cqt/CQT.Tests/ref_scipy_signal.py
+src/cqt/CQT.Tests/ref_utils.py
+/src/cqt/CQT.Tests/testdata
+/src/cqt/python/__pycache__
+src/cs/AiMusicDetector.sln.DotSettings.user
+/src/cs/AiMusicDetector/runtimes

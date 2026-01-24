@@ -4,14 +4,28 @@ using Microsoft.ML.OnnxRuntime.Tensors;
 namespace AiMusicDetector;
 
 /// <summary>
+/// Type of ONNX model for AI music detection.
+/// </summary>
+public enum ModelType
+{
+    /// <summary>Regression model using fakeprint features (2D input: batch x features)</summary>
+    Regression,
+    
+    /// <summary>CNN model using cepstrum features (4D input: batch x channels x height x width)</summary>
+    CNN
+}
+
+/// <summary>
 /// ONNX Runtime wrapper for AI music detection model inference.
+/// Supports both regression (2D) and CNN (4D) model types.
 /// </summary>
 public class OnnxInference : IDisposable
 {
     private readonly InferenceSession _session;
     private readonly string _inputName;
     private readonly string _outputName;
-    private readonly int _inputSize;
+    private readonly int[] _inputDimensions;
+    private readonly ModelType _modelType;
     private bool _disposed;
 
     /// <summary>
@@ -52,9 +66,9 @@ public class OnnxInference : IDisposable
         _inputName = inputMeta.Key;
         _outputName = outputMeta.Key;
         
-        // Get input size (second dimension after batch)
-        var inputDims = inputMeta.Value.Dimensions;
-        _inputSize = inputDims.Length > 1 ? inputDims[1] : inputDims[0];
+        // Store input dimensions and detect model type
+        _inputDimensions = inputMeta.Value.Dimensions;
+        _modelType = DetectModelType(_inputDimensions);
     }
 
     /// <summary>
@@ -90,14 +104,43 @@ public class OnnxInference : IDisposable
         _inputName = inputMeta.Key;
         _outputName = outputMeta.Key;
         
-        var inputDims = inputMeta.Value.Dimensions;
-        _inputSize = inputDims.Length > 1 ? inputDims[1] : inputDims[0];
+        // Store input dimensions and detect model type
+        _inputDimensions = inputMeta.Value.Dimensions;
+        _modelType = DetectModelType(_inputDimensions);
     }
 
     /// <summary>
-    /// Gets the expected input size (number of features).
+    /// Gets the detected model type (Regression or CNN).
     /// </summary>
-    public int InputSize => _inputSize;
+    public ModelType ModelType => _modelType;
+
+    /// <summary>
+    /// Gets the input dimensions of the model.
+    /// </summary>
+    public int[] InputDimensions => _inputDimensions;
+
+    /// <summary>
+    /// Gets the expected input size (number of features for regression models).
+    /// </summary>
+    public int InputSize => _inputDimensions.Length > 1 ? _inputDimensions[1] : _inputDimensions[0];
+
+    /// <summary>
+    /// Detects the model type from input dimensions.
+    /// </summary>
+    private static ModelType DetectModelType(int[] dimensions)
+    {
+        // 4D input (batch, channels, height, width) = CNN
+        // 2D input (batch, features) = Regression
+        return dimensions.Length >= 4 ? ModelType.CNN : ModelType.Regression;
+    }
+
+    /// <summary>
+    /// Applies sigmoid activation function.
+    /// </summary>
+    private static float Sigmoid(float x)
+    {
+        return 1.0f / (1.0f + MathF.Exp(-x));
+    }
 
     /// <summary>
     /// Run inference on a single fakeprint.
@@ -111,7 +154,7 @@ public class OnnxInference : IDisposable
     }
 
     /// <summary>
-    /// Run inference on a batch of fakeprints.
+    /// Run inference on a batch of fakeprints (for regression models).
     /// </summary>
     /// <param name="fakeprints">Array of fakeprint feature vectors</param>
     /// <returns>Array of AI probabilities</returns>
@@ -151,6 +194,63 @@ public class OnnxInference : IDisposable
     }
 
     /// <summary>
+    /// Run inference on a single cepstrum feature map (for CNN models).
+    /// Input is reshaped to 4D tensor [1, 1, n_coeffs, n_frames].
+    /// </summary>
+    /// <param name="cepstrum">Cepstrum features [n_coeffs, n_frames]</param>
+    /// <param name="applySigmoid">Whether to apply sigmoid to the output (default: true)</param>
+    /// <returns>AI probability (0.0 = Real, 1.0 = AI-Generated)</returns>
+    public float PredictCNN(float[,] cepstrum, bool applySigmoid = true)
+    {
+        int nCoeffs = cepstrum.GetLength(0);
+        int nFrames = cepstrum.GetLength(1);
+
+        // Create 4D input tensor [1, 1, n_coeffs, n_frames]
+        var inputData = new float[1 * 1 * nCoeffs * nFrames];
+        int idx = 0;
+        for (int c = 0; c < nCoeffs; c++)
+        {
+            for (int f = 0; f < nFrames; f++)
+            {
+                inputData[idx++] = cepstrum[c, f];
+            }
+        }
+
+        var inputTensor = new DenseTensor<float>(inputData, new[] { 1, 1, nCoeffs, nFrames });
+        var inputs = new List<NamedOnnxValue>
+        {
+            NamedOnnxValue.CreateFromTensor(_inputName, inputTensor)
+        };
+
+        // Run inference
+        using var results = _session.Run(inputs);
+        var outputTensor = results.First().AsTensor<float>();
+        
+        float logit = outputTensor.GetValue(0);
+        return applySigmoid ? Sigmoid(logit) : logit;
+    }
+
+    /// <summary>
+    /// Run batch inference on multiple cepstrum feature maps (for CNN models).
+    /// </summary>
+    /// <param name="cepstrums">Array of cepstrum features, each [n_coeffs, n_frames]</param>
+    /// <param name="applySigmoid">Whether to apply sigmoid to the output (default: true)</param>
+    /// <returns>Array of AI probabilities</returns>
+    public float[] PredictCNNBatch(float[][,] cepstrums, bool applySigmoid = true)
+    {
+        if (cepstrums.Length == 0)
+            return Array.Empty<float>();
+
+        // For now, process one at a time (batching with variable-size inputs is complex)
+        var results = new float[cepstrums.Length];
+        for (int i = 0; i < cepstrums.Length; i++)
+        {
+            results[i] = PredictCNN(cepstrums[i], applySigmoid);
+        }
+        return results;
+    }
+
+    /// <summary>
     /// Get model metadata.
     /// </summary>
     /// <returns>Dictionary of metadata key-value pairs</returns>
@@ -165,7 +265,9 @@ public class OnnxInference : IDisposable
         
         metadata["input_name"] = _inputName;
         metadata["output_name"] = _outputName;
-        metadata["input_size"] = _inputSize.ToString();
+        metadata["input_size"] = InputSize.ToString();
+        metadata["model_type"] = _modelType.ToString();
+        metadata["input_dimensions"] = string.Join("x", _inputDimensions);
         
         return metadata;
     }

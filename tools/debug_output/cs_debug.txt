@@ -1,0 +1,189 @@
+﻿Loading model...
+╭─────────────┬───────────────────╮
+│ Property    │ Value             │
+├─────────────┼───────────────────┤
+│ Model       │ cnn_detector.onnx │
+│ Type        │ CNN               │
+│ Sample Rate │ 16000 Hz          │
+│ Device      │ CPU               │
+╰─────────────┴───────────────────╯
+
+Debug Analysis: 01326459-437a-4853-960f-fcbbc22094a7.mp3
+
+Audio:
+  Samples: 4,359,680 (272.52s)
+  First 10 samples: [-0.001346, -0.001625, -0.001365, -0.001024, -0.000232, 
+0.000289, 0.000038, 0.000395, -0.000015, -0.000812]
+
+Segments (5):
+╭─────┬───────────┬───────────┬──────────┬────────╮
+│ Seg │ Start     │ Shape     │ Cep Mean │ Prob   │
+├─────┼───────────┼───────────┼──────────┼────────┤
+│ 0   │ 80,000    │ (24, 313) │ -0.7455  │ 10.16% │
+│ 1   │ 1,089,920 │ (24, 313) │ -0.4459  │ 89.43% │
+│ 2   │ 2,099,840 │ (24, 313) │ -0.5055  │ 64.90% │
+│ 3   │ 3,109,760 │ (24, 313) │ -0.6114  │ 89.55% │
+│ 4   │ 4,119,680 │ (24, 313) │ -1.2908  │ 2.93%  │
+╰─────┴───────────┴───────────┴──────────┴────────╯
+
+Segment Probabilities: [10.16%, 89.43%, 64.90%, 89.55%, 2.93%]
+Final (median): 64.90%
+Classification: AI-Generated
+
+JSON for Python comparison:
+{
+  "file": "01326459-437a-4853-960f-fcbbc22094a7.mp3",
+  "audio_samples": 4359680,
+  "audio_head": [
+    -0.0013461278,
+    -0.0016248323,
+    -0.0013652934,
+    -0.0010240163,
+    -0.00023196233,
+    0.00028862397,
+    3.7855207E-05,
+    0.00039542106,
+    -1.4941732E-05,
+    -0.0008123463
+  ],
+  "segments": [
+    {
+      "index": 0,
+      "start_sample": 80000,
+      "length_samples": 160000,
+      "cepstrum_shape": [
+        24,
+        313
+      ],
+      "cepstrum_coeff0_head": [
+        -36.185966,
+        -28.247917,
+        -28.182756,
+        -29.856075,
+        -31.503424
+      ],
+      "cepstrum_frame0_head": [
+        -36.185966,
+        8.181783,
+        2.2841823,
+        1.7844386,
+        -1.6168942
+      ],
+      "cepstrum_mean": -0.7455421,
+      "probability": 0.10160581
+    },
+    {
+      "index": 1,
+      "start_sample": 1089920,
+      "length_samples": 160000,
+      "cepstrum_shape": [
+        24,
+        313
+      ],
+      "cepstrum_coeff0_head": [
+        -12.87911,
+        -19.634836,
+        -18.381075,
+        -19.69556,
+        -19.217754
+      ],
+      "cepstrum_frame0_head": [
+        -12.87911,
+        2.3537803,
+        0.36272484,
+        -0.948636,
+        -2.530757
+      ],
+      "cepstrum_mean": -0.44585723,
+      "probability": 0.89427346
+    },
+    {
+      "index": 2,
+      "start_sample": 2099840,
+      "length_samples": 160000,
+      "cepstrum_shape": [
+        24,
+        313
+      ],
+      "cepstrum_coeff0_head": [
+        -23.055317,
+        -27.584873,
+        -23.289883,
+        -24.740553,
+        -26.844097
+      ],
+      "cepstrum_frame0_head": [
+        -23.055317,
+        2.8576887,
+        1.2675271,
+        2.5586307,
+        2.1863222
+      ],
+      "cepstrum_mean": -0.50552356,
+      "probability": 0.64901423
+    },
+    {
+      "index": 3,
+      "start_sample": 3109760,
+      "length_samples": 160000,
+      "cepstrum_shape": [
+        24,
+        313
+      ],
+      "cepstrum_coeff0_head": [
+        -21.473772,
+        -23.83819,
+        -24.85762,
+        -25.67042,
+        -23.643993
+      ],
+      "cepstrum_frame0_head": [
+        -21.473772,
+        2.591733,
+        0.42740455,
+        2.4717617,
+        -0.9285231
+      ],
+      "cepstrum_mean": -0.611424,
+      "probability": 0.8955086
+    },
+    {
+      "index": 4,
+      "start_sample": 4119680,
+      "length_samples": 160000,
+      "cepstrum_shape": [
+        24,
+        313
+      ],
+      "cepstrum_coeff0_head": [
+        -24.44671,
+        -30.901749,
+        -31.109707,
+        -29.640911,
+        -31.130548
+      ],
+      "cepstrum_frame0_head": [
+        -24.44671,
+        2.6548507,
+        0.84886956,
+        2.4230404,
+        1.7597123
+      ],
+      "cepstrum_mean": -1.2908,
+      "probability": 0.029291907
+    }
+  ],
+  "segment_probabilities": [
+    0.10160581,
+    0.89427346,
+    0.64901423,
+    0.8955086,
+    0.029291907
+  ],
+  "final_probability": 0.64901423,
+  "classification": "AI-Generated"
+}
+
+Debug output saved to: 
+C:\Users\lordo\Documents\GitHub\ai-music-detector\src\scrape\downloads\v4.5-all\
+01326459-437a-4853-960f-fcbbc22094a7.debug.json

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CQT\CQT.csproj" />
+  <Project Path="CQT.Tests\CQT.Tests.csproj" />
+</Solution>

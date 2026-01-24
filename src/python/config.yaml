@@ -15,12 +15,38 @@ audio:
   max_duration: 300   # seconds
   
 # Fakeprint extraction parameters (absolute frequencies in Hz)
+# Used by: extract_fakeprints.py, inference.py
 fakeprint:
   freq_min: 1000      # Hz - start of artifact detection range
   freq_max: 8000      # Hz - Nyquist limit for 16kHz
   hull_area: 10       # bins for lower hull computation
   max_db: 5           # dB clipping for normalization
   min_db: -45         # minimum dB threshold
+
+# CQT-Cepstrum parameters for robust CNN model
+# Covers 500Hz-8kHz (the artifact range for 16kHz audio)
+# Used by: extract_cqt_features.py, train_cnn.py, inference_cnn.py
+cqt:
+  fmin: 500             # Start frequency (500Hz, not 32.7Hz)
+  n_bins: 48            # 4 octaves: 500Hz -> 8kHz
+  bins_per_octave: 12   # Semitone resolution
+  hop_length: 512       # ~32ms at 16kHz
+
+# Cepstrum parameters
+cepstrum:
+  n_coeffs: 24          # Cepstral coefficients to keep (from 48 CQT bins)
+  segment_seconds: 10.0 # Segment length for feature extraction
+
+# CNN model configuration
+# Used by: train_cnn.py, inference_cnn.py
+cnn:
+  batch_size: 64        # Training batch size
+  learning_rate: 0.0001 # AdamW learning rate
+  epochs: 50            # Max training epochs
+  base_channels: 32     # Base channel count for CNN
+  dropout: 0.3          # Dropout probability
+  augment_prob: 0.5     # Probability of applying augmentations
+  early_stopping_patience: 10  # Epochs without improvement before stopping
 
 # Training parameters
 training:

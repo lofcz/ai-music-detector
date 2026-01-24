@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <LangVersion>preview</LangVersion>
+    <Nullable>disable</Nullable>
+    <RootNamespace>CQT</RootNamespace>
+    <AssemblyName>CQT</AssemblyName>
+    <Version>1.0.0</Version>
+    <Authors>AI Music Detector</Authors>
+    <Description>Constant-Q Transform implementation for audio analysis</Description>
+    <TargetFrameworks>netstandard2.0;net10.0</TargetFrameworks>
+  </PropertyGroup>
+</Project>

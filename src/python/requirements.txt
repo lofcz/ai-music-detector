@@ -9,6 +9,7 @@ scikit-learn>=1.3.0
 # ONNX export
 onnx>=1.20.1
 onnxruntime>=1.23.2
+onnxruntime-gpu>=1.23.2  # For GPU inference
 skl2onnx>=1.19.1
 
 # Data handling
@@ -20,6 +21,7 @@ pandas>=2.0.0
 soxr>=0.3.0
 librosa>=0.10.0
 soundfile>=0.12.0
+nnAudio>=0.3.0  # GPU-accelerated spectrograms
 
 # Visualization
 matplotlib>=3.7.0

@@ -24,11 +24,19 @@
     <!-- Audio processing -->
     <PackageReference Include="NAudio" Version="2.2.1" />
     
+    <!-- FFmpeg-based audio loading for torchaudio compatibility -->
+    <PackageReference Include="FFMpegCore" Version="5.4.0" />
+    
     <!-- FFT and numerical operations -->
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
     
     <!-- ONNX Runtime for model inference -->
-    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.16.3" />
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- CQT library for cepstrum features -->
+    <ProjectReference Include="..\..\cqt\CQT\CQT.csproj" />
   </ItemGroup>
 
   <!-- Include ONNX model as embedded resource -->
